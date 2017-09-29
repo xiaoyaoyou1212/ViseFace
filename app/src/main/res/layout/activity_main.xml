@@ -1,17 +1,44 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.vise.facedemo.MainActivity">
+    android:padding="10dp" >
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/face_title"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:layout_marginBottom="5dp"
+        android:gravity="center_horizontal"
+        android:layout_alignParentTop="true"
+        android:text="拍照测肤示例"
+        android:textSize="30sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/face_detector_demo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_centerInParent="true"
+            android:textAllCaps="false"
+            android:text="开始检测（原生）"
+            android:textSize="20sp"/>
+
+        <Button
+            android:id="@+id/face_detector_sdk_demo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_centerInParent="true"
+            android:textAllCaps="false"
+            android:text="开始检测（讯飞）"
+            android:textSize="20sp"/>
+
+    </LinearLayout>
+
 </RelativeLayout>

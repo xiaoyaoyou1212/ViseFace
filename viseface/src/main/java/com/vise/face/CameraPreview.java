@@ -194,10 +194,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
      */
     public void release() {
         closeCamera();
-        if (mHolder != null) {
-            mHolder.getSurface().release();
-            mHolder = null;
-        }
         if (mFaceDetector != null) {
             mFaceDetector.release();
             mFaceDetector = null;
