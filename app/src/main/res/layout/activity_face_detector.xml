@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 	>
-	<com.het.facedetector.CameraPreview
+	<com.vise.face.CameraPreview
 	    android:id="@+id/face_detector_preview"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"/>
 	
-	<com.het.facedetector.FaceRectView
+	<com.vise.face.FaceRectView
 	    android:id="@+id/face_detector_face"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"/>
-</RelativeLayout>
+</FrameLayout>

@@ -29,8 +29,6 @@ public class FaceDetectorActivity extends Activity {
     private CameraPreview mTake_photo_preview;
     private FaceRectView mTake_photo_face_rect;
 
-    private DetectorData mDetectorData;
-    private long mLastTime;
     private DetectorProxy mDetectorProxy;
     private IFaceDetector mFaceDetector;
 
@@ -94,7 +92,7 @@ public class FaceDetectorActivity extends Activity {
             }
         });
 
-        mFaceDetector.setDataListener(new IDataListener<String>() {
+        mDetectorProxy.setDataListener(new IDataListener<String>() {
             @Override
             public void onDetectorData(DetectorData<String> detectorData) {
                 if (isFinishing()) {
@@ -102,7 +100,6 @@ public class FaceDetectorActivity extends Activity {
                 }
                 ViseLog.i("识别数据:" + detectorData);
                 if (detectorData != null && detectorData.getFaceRectList() != null) {
-                    mDetectorData = detectorData;
                     mTake_photo_face_rect.drawFaceRect(detectorData);
                 }
             }

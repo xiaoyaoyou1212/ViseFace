@@ -10,7 +10,7 @@
         android:layout_marginBottom="5dp"
         android:gravity="center_horizontal"
         android:layout_alignParentTop="true"
-        android:text="拍照测肤示例"
+        android:text="人脸检测示例"
         android:textSize="30sp" />
 
     <LinearLayout

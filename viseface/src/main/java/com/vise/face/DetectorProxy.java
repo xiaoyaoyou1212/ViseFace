@@ -64,4 +64,8 @@ public class DetectorProxy<T>{
         return this;
     }
 
+    public static class Builder {
+
+    }
+
 }
