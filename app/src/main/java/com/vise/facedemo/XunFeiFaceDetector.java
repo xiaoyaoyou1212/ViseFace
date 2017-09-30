@@ -2,6 +2,7 @@ package com.vise.facedemo;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.hardware.Camera;
 import android.text.TextUtils;
 
 import com.iflytek.cloud.FaceDetector;
@@ -28,6 +29,7 @@ public class XunFeiFaceDetector<T> extends BaseFaceDetector<T> {
     public XunFeiFaceDetector(Context context) {
         super();
         mAcc = new Accelerometer(context);
+        mAcc.start();
         mFaceDetector = FaceDetector.createDetector(context, null);
     }
 
@@ -71,7 +73,7 @@ public class XunFeiFaceDetector<T> extends BaseFaceDetector<T> {
     protected void detectionFaces() {
         // 获取手机朝向，返回值0,1,2,3分别表示0,90,180和270度
         int direction = Accelerometer.getDirection();
-        boolean frontCamera = false;
+        boolean frontCamera = (Camera.CameraInfo.CAMERA_FACING_FRONT == mCameraId);
         // 前置摄像头预览显示的是镜像，需要将手机朝向换算成摄相头视角下的朝向。
         // 转换公式：a' = (360 - a)%360，a为人眼视角下的朝向（单位：角度）
         if (frontCamera) {
@@ -89,7 +91,7 @@ public class XunFeiFaceDetector<T> extends BaseFaceDetector<T> {
             return;
         }
 
-        String result = mFaceDetector.trackNV21(mDetectorData.getFaceData(), mCameraWidth, mCameraHeight, 0, direction);
+        String result = mFaceDetector.trackNV21(mDetectorData.getFaceData(), mPreviewWidth, mPreviewHeight, 0, direction);
         ViseLog.d("result:" + result);
 
         Rect[] rects = parseResult(result);

@@ -28,12 +28,12 @@ import java.util.List;
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
-    private int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+    private int mCameraId;
     private ICameraCheckListener mCheckListener;
     private IFaceDetector mFaceDetector;
     private int mDisplayOrientation;
-    private int mWidth;
-    private int mHeight;
+    private int mCameraWidth;
+    private int mCameraHeight;
 
     public CameraPreview(Context context) {
         super(context);
@@ -56,8 +56,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         DisplayMetrics metrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        mWidth = metrics.widthPixels;
-        mHeight = metrics.heightPixels;
+        mCameraWidth = metrics.widthPixels;
+        mCameraHeight = metrics.heightPixels;
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
@@ -88,6 +88,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // 只有一个摄相头，打开后置
         if (Camera.getNumberOfCameras() == 1) {
             mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+        }
+
+        if (mFaceDetector != null) {
+            mFaceDetector.setCameraId(mCameraId);
         }
 
         try {
@@ -156,13 +160,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             });
             mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
             mCamera.setPreviewDisplay(mHolder);
-            ViseLog.i("camera size width:" + mWidth + ",height:" + mHeight);
+            ViseLog.i("camera size width:" + mCameraWidth + ",height:" + mCameraHeight);
             if (mFaceDetector != null) {
-                mFaceDetector.setCameraWidth(mWidth);
-                mFaceDetector.setCameraHeight(mHeight);
+                mFaceDetector.setCameraWidth(mCameraWidth);
+                mFaceDetector.setCameraHeight(mCameraHeight);
             }
             //设置相机参数
-            setCameraParams(mCamera, mWidth, mHeight);
+            setCameraParams(mCamera, mCameraWidth, mCameraHeight);
             ViseLog.i("camera getPreviewSize width:" + mCamera.getParameters().getPreviewSize().width
                     + ",height:" + mCamera.getParameters().getPreviewSize().height);
             ViseLog.i("camera getPictureSize width:" + mCamera.getParameters().getPictureSize().width
@@ -223,6 +227,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return this;
     }
 
+    public int getCameraHeight() {
+        return mCameraHeight;
+    }
+
+    public int getCameraWidth() {
+        return mCameraWidth;
+    }
+
     public int getDisplayOrientation() {
         return mDisplayOrientation;
     }
@@ -277,6 +289,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
         if (mFaceDetector != null) {
             mFaceDetector.setZoomRatio(5f * scale);
+            mFaceDetector.setPreviewWidth((int) w);
+            mFaceDetector.setPreviewHeight((int) h);
         }
 
         parameters.setJpegQuality(100);

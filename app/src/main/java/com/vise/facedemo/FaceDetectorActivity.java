@@ -26,8 +26,8 @@ import com.vise.log.ViseLog;
 public class FaceDetectorActivity extends Activity {
 
     private Context mContext;
-    private CameraPreview mTake_photo_preview;
-    private FaceRectView mTake_photo_face_rect;
+    private CameraPreview mFace_detector_preview;
+    private FaceRectView mFace_detector_face;
 
     private DetectorProxy mDetectorProxy;
     private IFaceDetector mFaceDetector;
@@ -44,6 +44,13 @@ public class FaceDetectorActivity extends Activity {
         }
     };
 
+    private IDataListener mDataListener = new IDataListener() {
+        @Override
+        public void onDetectorData(DetectorData detectorData) {
+            ViseLog.i("识别数据:" + detectorData);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,21 +59,19 @@ public class FaceDetectorActivity extends Activity {
         } else {
             mFaceDetector = new NormalFaceDetector();
         }
-        mDetectorProxy = new DetectorProxy();
-        mDetectorProxy.init(mFaceDetector);
         setContentView(R.layout.activity_face_detector);
         mContext = this;
         init();
     }
 
     protected void init() {
-        mTake_photo_preview = (CameraPreview) findViewById(R.id.face_detector_preview);
-        mTake_photo_face_rect = (FaceRectView) findViewById(R.id.face_detector_face);
-        mTake_photo_face_rect.setZOrderOnTop(true);
-        mTake_photo_face_rect.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+        mFace_detector_preview = (CameraPreview) findViewById(R.id.face_detector_preview);
+        mFace_detector_face = (FaceRectView) findViewById(R.id.face_detector_face);
+        mFace_detector_face.setZOrderOnTop(true);
+        mFace_detector_face.getHolder().setFormat(PixelFormat.TRANSLUCENT);
 
         // 点击SurfaceView，切换摄相头
-        mTake_photo_preview.setOnClickListener(new View.OnClickListener() {
+        mFace_detector_preview.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -74,39 +79,26 @@ public class FaceDetectorActivity extends Activity {
                 if (Camera.getNumberOfCameras() == 1) {
                     return;
                 }
-                mTake_photo_preview.closeCamera();
-                if (mDetectorProxy != null) {
-                    mDetectorProxy.release();
-                }
-                if (Camera.CameraInfo.CAMERA_FACING_FRONT == mTake_photo_preview.getCameraId()) {
-                    mTake_photo_preview.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK);
-                    mTake_photo_face_rect.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK);
-                } else {
-                    mTake_photo_preview.setCameraId(Camera.CameraInfo.CAMERA_FACING_FRONT);
-                    mTake_photo_face_rect.setCameraId(Camera.CameraInfo.CAMERA_FACING_FRONT);
-                }
-                mTake_photo_preview.openCamera();
-                if (mDetectorProxy != null) {
-                    mDetectorProxy.detector();
-                }
-            }
-        });
-
-        mDetectorProxy.setDataListener(new IDataListener<String>() {
-            @Override
-            public void onDetectorData(DetectorData<String> detectorData) {
-                if (isFinishing()) {
+                if (mDetectorProxy == null) {
                     return;
                 }
-                ViseLog.i("识别数据:" + detectorData);
-                if (detectorData != null && detectorData.getFaceRectList() != null) {
-                    mTake_photo_face_rect.drawFaceRect(detectorData);
+                mDetectorProxy.closeCamera();
+                if (Camera.CameraInfo.CAMERA_FACING_FRONT == mDetectorProxy.getCameraId()) {
+                    mDetectorProxy.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK);
+                } else {
+                    mDetectorProxy.setCameraId(Camera.CameraInfo.CAMERA_FACING_FRONT);
                 }
+                mDetectorProxy.openCamera();
             }
         });
 
-        mTake_photo_preview.setCheckListener(mCameraCheckListener);
-        mTake_photo_preview.setFaceDetector(mFaceDetector);
+        mDetectorProxy = new DetectorProxy.Builder(mFace_detector_preview)
+                .setCheckListener(mCameraCheckListener)
+                .setFaceDetector(mFaceDetector)
+                .setDataListener(mDataListener)
+                .setFaceRectView(mFace_detector_face)
+                .setDrawFaceRect(true)
+                .build();
     }
 
     @Override
@@ -134,18 +126,12 @@ public class FaceDetectorActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-        System.gc();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mTake_photo_preview != null) {
-            mTake_photo_preview.release();
-        }
-        mTake_photo_preview = null;
-        mDetectorProxy = null;
         System.gc();
     }
 

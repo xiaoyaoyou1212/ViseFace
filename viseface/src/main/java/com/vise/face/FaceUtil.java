@@ -1,7 +1,6 @@
 package com.vise.face;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -49,13 +48,13 @@ public class FaceUtil {
         return sum / index;
     }
 
-    public static void drawFaceRect(Canvas canvas, Rect rect, int width, boolean frontCamera, boolean drawRect) {
+    public static void drawFaceRect(Canvas canvas, Rect rect, int rectColor, int width, boolean frontCamera, boolean drawRect) {
         if (canvas == null) {
             return;
         }
 
         Paint paint = new Paint();
-        paint.setColor(Color.rgb(255, 203, 15));
+        paint.setColor(rectColor);
         float len = (rect.bottom - rect.top) / 8;
         if (len / 8 >= 2) paint.setStrokeWidth(len / 8);
         else paint.setStrokeWidth(2);

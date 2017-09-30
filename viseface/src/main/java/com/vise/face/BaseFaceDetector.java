@@ -9,19 +9,20 @@ import android.hardware.Camera;
  */
 public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable {
 
-    private static final int MAX_DETECTOR_FACES = 5;
-
     private Thread mThread;
     private boolean mStopTrack;
     private IDataListener<T> mDataListener;
 
     protected DetectorData<T> mDetectorData;
     protected Camera mCamera;
+    protected int mCameraId;
     protected float mZoomRatio;//缩放比例
     protected int mCameraWidth;
     protected int mCameraHeight;
+    protected int mPreviewWidth;
+    protected int mPreviewHeight;
     protected int mOrientionOfCamera;
-    protected int mMaxFacesCount = MAX_DETECTOR_FACES;
+    protected int mMaxFacesCount;
     protected boolean mOpenCamera = false;
 
     public BaseFaceDetector() {
@@ -147,5 +148,32 @@ public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable 
     @Override
     public void setOpenCamera(boolean isOpenCamera) {
         this.mOpenCamera = isOpenCamera;
+    }
+
+    /**
+     * 设置相机ID
+     * @param mCameraId
+     */
+    @Override
+    public void setCameraId(int mCameraId) {
+        this.mCameraId = mCameraId;
+    }
+
+    /**
+     * 设置预览高度
+     * @param mPreviewHeight
+     */
+    @Override
+    public void setPreviewHeight(int mPreviewHeight) {
+        this.mPreviewHeight = mPreviewHeight;
+    }
+
+    /**
+     * 设置预览宽度
+     * @param mPreviewWidth
+     */
+    @Override
+    public void setPreviewWidth(int mPreviewWidth) {
+        this.mPreviewWidth = mPreviewWidth;
     }
 }

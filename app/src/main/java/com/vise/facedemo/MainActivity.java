@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 
 import com.iflytek.cloud.SpeechUtility;
+import com.vise.log.ViseLog;
+import com.vise.log.inner.LogcatTree;
 
 /**
  * @Description: 主页
@@ -24,6 +26,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ViseLog.plant(new LogcatTree());
         SpeechUtility.createUtility(this, "appid=" + getString(R.string.app_id));
         this.mContext = this;
         init();

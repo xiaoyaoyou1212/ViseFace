@@ -15,6 +15,9 @@ public interface IFaceDetector<T> {
     void setMaxFacesCount(int mMaxFacesCount);
     void setCameraHeight(int mCameraHeight);
     void setCameraWidth(int mCameraWidth);
+    void setPreviewHeight(int mPreviewHeight);
+    void setPreviewWidth(int mPreviewWidth);
+    void setCameraId(int mCameraId);
     void setOrientionOfCamera(int mOrientionOfCamera);
     void setZoomRatio(float mZoomRatio);
     void setOpenCamera(boolean isOpenCamera);

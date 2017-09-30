@@ -18,4 +18,7 @@
         <activity android:name=".FaceDetectorActivity" />
     </application>
 
+    <!--讯飞人脸检测必加权限，否则会提示“引擎初始化失败.(错误码:21003)”-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
 </manifest>
