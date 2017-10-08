@@ -1,7 +1,7 @@
 package com.vise.facedemo;
 
 import android.app.Activity;
-import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -26,7 +26,6 @@ import com.vise.log.ViseLog;
  */
 public class FaceDetectorActivity extends Activity {
 
-    private Context mContext;
     private CameraPreview mFace_detector_preview;
     private FaceRectView mFace_detector_face;
     private Button mFace_detector_take_photo;
@@ -57,7 +56,6 @@ public class FaceDetectorActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face_detector);
-        mContext = this;
         init();
     }
 
@@ -119,6 +117,10 @@ public class FaceDetectorActivity extends Activity {
                 .setDataListener(mDataListener)
                 .setFaceRectView(mFace_detector_face)
                 .setDrawFaceRect(true)
+                .setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
+                .setMaxFacesCount(5)
+                .setFaceIsRect(false)
+                .setFaceRectColor(Color.rgb(255, 203, 15))
                 .build();
     }
 
