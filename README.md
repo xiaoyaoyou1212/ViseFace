@@ -15,17 +15,26 @@
 
 ### 为什么打造该库
 1、想简单快速接入人脸检测功能；
+
 2、Google 提供的人脸检测功能部分手机无法适配；
+
 3、第三方提供的人脸检测功能接入门槛过高；
+
 4、依赖第三方库会增加 APK 大小。
 
 ### 功能介绍
 1、可快速识别人脸；
+
 2、可适配所有机型；
+
 3、可配置最大检测人脸数；
+
 4、可配置是否显示人脸检测框；
+
 5、可配置当前检测人脸摄像头为前置和后置；
+
 6、可检测到最近人脸范围的光照值，光照范围 0 - 255；
+
 7、可检测到的最近人脸相对于屏幕宽度的比例。
 
 ### 效果演示
@@ -100,6 +109,7 @@ IDataListener mDataListener = new IDataListener() {
 ```
 
 6、设置相关配置，创建人脸检测代理
+该库的核心思想就是快速接入人脸检测功能，所以该库的功能都是通过 `DetectorProxy` 代理类来实现，使用简单明了。具体使用场景如下：
 ```
 //创建代理类，必须传入相机预览界面
 DetectorProxy mDetectorProxy = new DetectorProxy.Builder(mFace_detector_preview)
@@ -138,9 +148,6 @@ if (mDetectorProxy != null) {
     mDetectorProxy.release();
 }
 ```
-
-### 源码解析
-该库核心思想就是简单快速接入人脸检测功能
 
 ### 关于我
 [![Website](https://img.shields.io/badge/Website-huwei-blue.svg)](http://www.huwei.tech/)
