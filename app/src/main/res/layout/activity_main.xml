@@ -1,15 +1,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp" >
+    android:padding="10dp"
+    android:background="@android:color/white">
 
     <TextView
         android:id="@+id/face_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_marginTop="30dp"
         android:gravity="center_horizontal"
-        android:layout_alignParentTop="true"
         android:text="人脸检测示例"
         android:textSize="30sp" />
 
@@ -23,20 +23,11 @@
             android:id="@+id/face_detector_demo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_centerInParent="true"
+            android:background="@android:color/darker_gray"
+            android:padding="10dp"
+            android:gravity="center"
             android:textAllCaps="false"
             android:text="开始检测（原生）"
-            android:textSize="20sp"/>
-
-        <Button
-            android:id="@+id/face_detector_sdk_demo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_centerInParent="true"
-            android:textAllCaps="false"
-            android:text="开始检测（讯飞）"
             android:textSize="20sp"/>
 
     </LinearLayout>

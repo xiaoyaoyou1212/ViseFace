@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.iflytek.cloud.SpeechUtility;
 import com.vise.log.ViseLog;
 import com.vise.log.inner.LogcatTree;
 
@@ -20,34 +19,22 @@ public class MainActivity extends Activity {
 
     private Context mContext;
     private Button mFace_detector_demo;
-    private Button mFace_detector_sdk_demo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ViseLog.plant(new LogcatTree());
-        SpeechUtility.createUtility(this, "appid=" + getString(R.string.app_id));
         this.mContext = this;
         init();
     }
 
     private void init() {
         mFace_detector_demo = (Button) findViewById(R.id.face_detector_demo);
-        mFace_detector_sdk_demo = (Button) findViewById(R.id.face_detector_sdk_demo);
         mFace_detector_demo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, FaceDetectorActivity.class);
-                intent.putExtra("isSdk", false);
-                startActivity(intent);
-            }
-        });
-        mFace_detector_sdk_demo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(mContext, FaceDetectorActivity.class);
-                intent.putExtra("isSdk", true);
                 startActivity(intent);
             }
         });

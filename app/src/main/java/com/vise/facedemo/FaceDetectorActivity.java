@@ -7,6 +7,7 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 
 import com.vise.face.CameraPreview;
 import com.vise.face.DetectorData;
@@ -28,6 +29,7 @@ public class FaceDetectorActivity extends Activity {
     private Context mContext;
     private CameraPreview mFace_detector_preview;
     private FaceRectView mFace_detector_face;
+    private Button mFace_detector_take_photo;
 
     private DetectorProxy mDetectorProxy;
     private IFaceDetector mFaceDetector;
@@ -54,11 +56,6 @@ public class FaceDetectorActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (this.getIntent().getBooleanExtra("isSdk", false)) {
-            mFaceDetector = new XunFeiFaceDetector(this);
-        } else {
-            mFaceDetector = new NormalFaceDetector();
-        }
         setContentView(R.layout.activity_face_detector);
         mContext = this;
         init();
@@ -69,6 +66,7 @@ public class FaceDetectorActivity extends Activity {
         mFace_detector_face = (FaceRectView) findViewById(R.id.face_detector_face);
         mFace_detector_face.setZOrderOnTop(true);
         mFace_detector_face.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+        mFace_detector_take_photo = (Button) findViewById(R.id.face_detector_take_photo);
 
         // 点击SurfaceView，切换摄相头
         mFace_detector_preview.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +90,29 @@ public class FaceDetectorActivity extends Activity {
             }
         });
 
+        mFace_detector_take_photo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mFace_detector_preview.getCamera().takePicture(new Camera.ShutterCallback() {
+                    @Override
+                    public void onShutter() {
+
+                    }
+                }, null, new Camera.PictureCallback() {
+                    @Override
+                    public void onPictureTaken(byte[] bytes, Camera camera) {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        finish();
+                    }
+                });
+            }
+        });
+
+        mFaceDetector = new NormalFaceDetector();
         mDetectorProxy = new DetectorProxy.Builder(mFace_detector_preview)
                 .setCheckListener(mCameraCheckListener)
                 .setFaceDetector(mFaceDetector)
