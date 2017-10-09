@@ -38,7 +38,7 @@
 7、可检测到的最近人脸相对于屏幕宽度的比例。
 
 ### 效果演示
-![效果演示](https://github.com/xiaoyaoyou1212/ViseFace/blob/master/screenshot/screenshot.gif)
+![效果演示](http://img.blog.csdn.net/20171009161954864)
 
 ### 使用介绍
 1、导入人脸检测库
