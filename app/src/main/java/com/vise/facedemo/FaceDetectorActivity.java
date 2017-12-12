@@ -125,6 +125,7 @@ public class FaceDetectorActivity extends Activity {
                 }, null, new Camera.PictureCallback() {
                     @Override
                     public void onPictureTaken(byte[] bytes, Camera camera) {
+                        mFace_detector_preview.getCamera().stopPreview();
                         saveImage(bytes);
                         finish();
                     }
@@ -281,7 +282,11 @@ public class FaceDetectorActivity extends Activity {
         try {
             fileOutputStream = new FileOutputStream(pictureFile);
             if (mFace_detector_preview != null) {
-                bitmap = rotaingImageView(mFace_detector_preview.getDisplayOrientation(), bitmap);
+                if (mFace_detector_preview.getCameraId() == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                    bitmap = rotaingImageView(360 - mFace_detector_preview.getDisplayOrientation(), bitmap);
+                } else {
+                    bitmap = rotaingImageView(mFace_detector_preview.getDisplayOrientation(), bitmap);
+                }
             }
             bitmap.compress(Bitmap.CompressFormat.JPEG, options, fileOutputStream);
         } catch (FileNotFoundException var18) {
