@@ -5,13 +5,13 @@
 
 - 项目地址：[https://github.com/xiaoyaoyou1212/ViseFace](https://github.com/xiaoyaoyou1212/ViseFace)
 
-- 项目依赖：`compile 'com.vise.xiaoyaoyou:viseface:1.0.0'`
+- 项目依赖：`compile 'com.vise.xiaoyaoyou:viseface:1.1.0'`
 
 ### 版本说明
-[![LatestVersion](https://img.shields.io/badge/LatestVersion-1.0.0-orange.svg)](https://github.com/xiaoyaoyou1212/ViseFace/blob/master/VERSION.md)
+[![LatestVersion](https://img.shields.io/badge/LatestVersion-1.1.0-orange.svg)](https://github.com/xiaoyaoyou1212/ViseFace/blob/master/VERSION.md)
 
 ### 代码托管
-[![JCenter](https://img.shields.io/badge/JCenter-1.0.0-orange.svg)](https://jcenter.bintray.com/com/vise/xiaoyaoyou/viseface/1.0.0/)
+[![JCenter](https://img.shields.io/badge/JCenter-1.1.0-orange.svg)](https://jcenter.bintray.com/com/vise/xiaoyaoyou/viseface/1.1.0/)
 
 ### 为什么打造该库
 1、想简单快速接入人脸检测功能；
@@ -43,7 +43,7 @@
 ### 使用介绍
 1、导入人脸检测库
 在工程的 build 文件中添加如下依赖：
-`compile 'com.vise.xiaoyaoyou:viseface:1.0.0'`
+`compile 'com.vise.xiaoyaoyou:viseface:1.1.0'`
 
 2、创建相机预览布局
 ```
