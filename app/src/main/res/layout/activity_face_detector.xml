@@ -21,4 +21,12 @@
 		android:layout_gravity="bottom|center_horizontal"
 		android:background="@android:drawable/ic_menu_camera"
 		/>
+
+	<TextView
+		android:id="@+id/face_detector_distance"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_margin="20dp"
+		android:textColor="@color/colorPrimary"
+		android:textSize="18sp"/>
 </FrameLayout>

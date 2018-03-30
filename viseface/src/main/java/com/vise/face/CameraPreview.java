@@ -1,24 +1,16 @@
 package com.vise.face;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.graphics.Point;
 import android.hardware.Camera;
 import android.os.Build;
-import android.os.Process;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.FrameLayout;
 
 import com.vise.log.ViseLog;
-
-import java.util.List;
 
 /**
  * @Description: 自定义相机
@@ -29,6 +21,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder mHolder;
     private Camera mCamera;
     private int mCameraId;
+    private long mMinCameraPixels;
     private ICameraCheckListener mCheckListener;
     private IFaceDetector mFaceDetector;
     private int mDisplayOrientation;
@@ -80,8 +73,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             return;
         }
 
-        if (!checkCameraPermission()) {
+        if (!FaceUtil.checkCameraPermission(getContext())) {
             ViseLog.i("摄像头权限未打开，请打开后再试");
+            if (mCheckListener != null) {
+                mCheckListener.checkPermission(false);
+            }
             return;
         }
 
@@ -126,23 +122,22 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCheckListener.checkPermission(true);
         }
 
+        long pixels = 0;
         try {
             //获取最大宽高，得出最大支持像素
             Camera.Parameters parameters = mCamera.getParameters();
-            List<Camera.Size> pictureSizeList = parameters.getSupportedPictureSizes();
-            long pixels;
-            if (pictureSizeList.get(0).height < pictureSizeList.get(pictureSizeList.size() - 1).height) {
-                pixels = pictureSizeList.get(pictureSizeList.size() - 1).width * pictureSizeList.get(pictureSizeList.size() - 1).height;
-            } else {
-                pixels = pictureSizeList.get(0).width * pictureSizeList.get(0).height;
+            Camera.Size maxPictureSize = FaceUtil.findMaxCameraSize(parameters.getSupportedPictureSizes());
+            if (maxPictureSize != null) {
+                pixels = maxPictureSize.width * maxPictureSize.height;
             }
+            ViseLog.i("camera max support pixels: " + pixels);
             //回调该手机像素值
-            if (mCheckListener != null) {
-                if (pixels > 300 * 10000) {
+            if (mCheckListener != null && mMinCameraPixels > 0) {
+                if (pixels >= mMinCameraPixels) {
                     mCheckListener.checkPixels(pixels, true);
                 } else {
-                    mCheckListener.checkPixels(pixels, false);
                     closeCamera();
+                    mCheckListener.checkPixels(pixels, false);
                     return;
                 }
             }
@@ -166,7 +161,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 mFaceDetector.setCameraHeight(mCameraHeight);
             }
             //设置相机参数
-            setCameraParams(mCamera, mCameraWidth, mCameraHeight);
+            mDisplayOrientation = FaceUtil.setCameraParams(this, mFaceDetector, mCamera, mCameraId, mCameraWidth, mCameraHeight);
             ViseLog.i("camera getPreviewSize width:" + mCamera.getParameters().getPreviewSize().width
                     + ",height:" + mCamera.getParameters().getPreviewSize().height);
             ViseLog.i("camera getPictureSize width:" + mCamera.getParameters().getPictureSize().width
@@ -174,6 +169,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             //开始预览
             mCamera.startPreview();
         } catch (Exception e) {
+            closeCamera();
+            mCheckListener.checkPixels(pixels, false);
             ViseLog.d("Error starting camera preview: " + e.getMessage());
         }
     }
@@ -186,10 +183,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mFaceDetector.setOpenCamera(false);
         }
         if (null != mCamera) {
-            mCamera.setPreviewCallback(null);
-            mCamera.stopPreview();
-            mCamera.release();
-            mCamera = null;
+            try {
+                mCamera.setPreviewCallback(null);
+                mCamera.stopPreview();
+                mCamera.release();
+                mCamera = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -200,7 +201,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         closeCamera();
         if (mFaceDetector != null) {
             mFaceDetector.release();
-            mFaceDetector = null;
         }
     }
 
@@ -227,6 +227,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return this;
     }
 
+    public CameraPreview setMinCameraPixels(long mMinCameraPixels) {
+        this.mMinCameraPixels = mMinCameraPixels;
+        return this;
+    }
+
     public int getCameraHeight() {
         return mCameraHeight;
     }
@@ -239,104 +244,4 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return mDisplayOrientation;
     }
 
-    /**
-     * 检查相机权限
-     *
-     * @return
-     */
-    private boolean checkCameraPermission() {
-        int status = getContext().checkPermission(Manifest.permission.CAMERA, Process.myPid(), Process.myUid());
-        if (PackageManager.PERMISSION_GRANTED == status) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * 在摄像头启动前设置参数
-     *
-     * @param camera
-     * @param width
-     * @param height
-     */
-    private void setCameraParams(Camera camera, int width, int height) {
-        // 获取摄像头支持的pictureSize列表
-        Camera.Parameters parameters = camera.getParameters();
-        List<Camera.Size> pictureSizeList = parameters.getSupportedPictureSizes();
-        // 从列表中选择合适的分辨率
-        Point pictureSize = FaceUtil.findBestResolution(pictureSizeList, new Point(width, height), true, 0.15f);
-        // 根据选出的PictureSize重新设置SurfaceView大小
-        parameters.setPictureSize(pictureSize.x, pictureSize.y);
-
-        // 获取摄像头支持的PreviewSize列表
-        List<Camera.Size> previewSizeList = parameters.getSupportedPreviewSizes();
-        Point preSize = FaceUtil.findBestResolution(previewSizeList, new Point(width, height), false, 0.15f);
-        parameters.setPreviewSize(preSize.x, preSize.y);
-
-        float w = preSize.x;
-        float h = preSize.y;
-        float scale = 1.0f;
-        int tempW = (int) (height * (h / w));
-        int tempH = (int) (width * (w / h));
-        if (tempW >= width) {
-            setLayoutParams(new FrameLayout.LayoutParams(tempW, height));
-            scale = tempW / h;
-        } else if (tempH >= height) {
-            setLayoutParams(new FrameLayout.LayoutParams(width, tempH));
-            scale = tempH / w;
-        } else {
-            setLayoutParams(new FrameLayout.LayoutParams(width, height));
-        }
-        if (mFaceDetector != null) {
-            mFaceDetector.setZoomRatio(5f * scale);
-            mFaceDetector.setPreviewWidth((int) w);
-            mFaceDetector.setPreviewHeight((int) h);
-        }
-
-        parameters.setJpegQuality(100);
-        if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-            // 连续对焦
-            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        }
-        camera.cancelAutoFocus();
-        setCameraDisplayOrientation();
-        camera.setParameters(parameters);
-    }
-
-    /**
-     * 设置相机显示方向
-     */
-    private void setCameraDisplayOrientation() {
-        Camera.CameraInfo info = new Camera.CameraInfo();
-        Camera.getCameraInfo(mCameraId, info);
-        int rotation = ((Activity) getContext()).getWindowManager().getDefaultDisplay().getRotation();
-        int degree = 0;
-        switch (rotation) {
-            case Surface.ROTATION_0:
-                degree = 0;
-                break;
-            case Surface.ROTATION_90:
-                degree = 90;
-                break;
-            case Surface.ROTATION_180:
-                degree = 180;
-                break;
-            case Surface.ROTATION_270:
-                degree = 270;
-                break;
-        }
-        if (mFaceDetector != null) {
-            mFaceDetector.setOrientionOfCamera(info.orientation);
-        }
-
-        int result;
-        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            result = (info.orientation + degree) % 360;
-            result = (360 - result) % 360;
-        } else {
-            result = (info.orientation - degree + 360) % 360;
-        }
-        mDisplayOrientation = result;
-        mCamera.setDisplayOrientation(result);
-    }
 }

@@ -10,8 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.vise.log.ViseLog;
-import com.vise.log.inner.LogcatTree;
 import com.vise.xsnow.permission.OnPermissionCallback;
 import com.vise.xsnow.permission.PermissionManager;
 
@@ -29,7 +27,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ViseLog.plant(new LogcatTree());
         this.mContext = this;
         init();
     }

@@ -71,6 +71,7 @@ public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable 
 
     /**
      * 设置检测监听
+     *
      * @param mDataListener
      */
     @Override
@@ -80,6 +81,7 @@ public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable 
 
     /**
      * 设置预览数据
+     *
      * @param data
      * @param camera
      */
@@ -93,6 +95,7 @@ public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable 
 
     /**
      * 设置识别最大人脸数量
+     *
      * @param mMaxFacesCount
      * @return
      */
@@ -103,6 +106,7 @@ public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable 
 
     /**
      * 设置相机高度
+     *
      * @param mCameraHeight 相机高度
      * @return
      */
@@ -113,6 +117,7 @@ public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable 
 
     /**
      * 设置相机宽度
+     *
      * @param mCameraWidth 相机宽度
      * @return
      */
@@ -123,6 +128,7 @@ public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable 
 
     /**
      * 设置相机方向
+     *
      * @param mOrientionOfCamera 相机方向
      * @return
      */
@@ -133,6 +139,7 @@ public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable 
 
     /**
      * 设置缩放比例
+     *
      * @param mZoomRatio
      * @return
      */
@@ -143,6 +150,7 @@ public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable 
 
     /**
      * 设置相机是否打开
+     *
      * @param isOpenCamera
      */
     @Override
@@ -152,6 +160,7 @@ public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable 
 
     /**
      * 设置相机ID
+     *
      * @param mCameraId
      */
     @Override
@@ -161,6 +170,7 @@ public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable 
 
     /**
      * 设置预览高度
+     *
      * @param mPreviewHeight
      */
     @Override
@@ -170,6 +180,7 @@ public abstract class BaseFaceDetector<T> implements IFaceDetector<T>, Runnable 
 
     /**
      * 设置预览宽度
+     *
      * @param mPreviewWidth
      */
     @Override

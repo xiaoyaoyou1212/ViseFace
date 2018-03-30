@@ -4,16 +4,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vise.face.CameraPreview;
@@ -22,9 +25,8 @@ import com.vise.face.DetectorProxy;
 import com.vise.face.FaceRectView;
 import com.vise.face.ICameraCheckListener;
 import com.vise.face.IDataListener;
-import com.vise.face.IFaceDetector;
-import com.vise.face.NormalFaceDetector;
 import com.vise.log.ViseLog;
+import com.vise.utils.assist.StringUtil;
 import com.vise.utils.view.ViewUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -43,11 +45,21 @@ public class FaceDetectorActivity extends Activity {
     private CameraPreview mFace_detector_preview;
     private FaceRectView mFace_detector_face;
     private Button mFace_detector_take_photo;
+    private TextView mFace_detector_distance;
 
     private Context mContext;
     private DetectorProxy mDetectorProxy;
-    private IFaceDetector mFaceDetector;
     private DetectorData mDetectorData;
+
+    private Handler mHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (mDetectorData != null) {
+                mFace_detector_distance.setText(StringUtil.parseStr(mDetectorData.getLightIntensity()));
+            }
+        }
+    };
 
     private ICameraCheckListener mCameraCheckListener = new ICameraCheckListener() {
         @Override
@@ -74,6 +86,7 @@ public class FaceDetectorActivity extends Activity {
         public void onDetectorData(DetectorData detectorData) {
             mDetectorData = detectorData;
             ViseLog.i("识别数据:" + detectorData);
+            mHandler.sendEmptyMessage(0);
         }
     };
 
@@ -91,6 +104,7 @@ public class FaceDetectorActivity extends Activity {
         mFace_detector_face.setZOrderOnTop(true);
         mFace_detector_face.getHolder().setFormat(PixelFormat.TRANSLUCENT);
         mFace_detector_take_photo = (Button) findViewById(R.id.face_detector_take_photo);
+        mFace_detector_distance = (TextView) findViewById(R.id.face_detector_distance);
 
         // 点击SurfaceView，切换摄相头
         mFace_detector_preview.setOnClickListener(new View.OnClickListener() {
@@ -133,17 +147,12 @@ public class FaceDetectorActivity extends Activity {
             }
         });
 
-        mFaceDetector = new NormalFaceDetector();
         mDetectorProxy = new DetectorProxy.Builder(mFace_detector_preview)
+                .setMinCameraPixels(3000000)
                 .setCheckListener(mCameraCheckListener)
-                .setFaceDetector(mFaceDetector)
                 .setDataListener(mDataListener)
                 .setFaceRectView(mFace_detector_face)
                 .setDrawFaceRect(true)
-                .setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
-                .setMaxFacesCount(5)
-                .setFaceIsRect(false)
-                .setFaceRectColor(Color.rgb(255, 203, 15))
                 .build();
     }
 
@@ -183,6 +192,7 @@ public class FaceDetectorActivity extends Activity {
 
     /**
      * 保存拍照的图片
+     *
      * @param data
      */
     private void saveImage(byte[] data) {
@@ -244,20 +254,20 @@ public class FaceDetectorActivity extends Activity {
         int w = options.outWidth;
         int h = options.outHeight;
         float scale = 1.0F;
-        if(w < h) {
-            scale = ww / (float)w;
-            if(hh / (float)h > scale) {
-                scale = hh / (float)h;
+        if (w < h) {
+            scale = ww / (float) w;
+            if (hh / (float) h > scale) {
+                scale = hh / (float) h;
             }
         } else {
-            scale = ww / (float)h;
-            if(hh / (float)w > scale) {
-                scale = hh / (float)w;
+            scale = ww / (float) h;
+            if (hh / (float) w > scale) {
+                scale = hh / (float) w;
             }
         }
 
-        Bitmap scaleBitmap = scaleImage(bitmap, (int)((float)w * scale), (int)((float)h * scale));
-        if(bitmap != null && !bitmap.isRecycled()) {
+        Bitmap scaleBitmap = scaleImage(bitmap, (int) ((float) w * scale), (int) ((float) h * scale));
+        if (bitmap != null && !bitmap.isRecycled()) {
             bitmap.recycle();
             bitmap = null;
         }
@@ -271,7 +281,7 @@ public class FaceDetectorActivity extends Activity {
         image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         int options = 100;
 
-        while(baos.toByteArray().length / 1024 > size) {
+        while (baos.toByteArray().length / 1024 > size) {
             baos.reset();
             options -= 5;
             image.compress(Bitmap.CompressFormat.JPEG, options, baos);
@@ -293,7 +303,7 @@ public class FaceDetectorActivity extends Activity {
             ViseLog.e("File not found: " + var18.getMessage());
         } finally {
             try {
-                if(fileOutputStream != null) {
+                if (fileOutputStream != null) {
                     fileOutputStream.flush();
                     fileOutputStream.close();
                 }
@@ -324,12 +334,12 @@ public class FaceDetectorActivity extends Activity {
         } catch (FileNotFoundException var18) {
             ViseLog.e("File not found: " + var18.getMessage());
         } finally {
-            if(avatarBitmap != null && !avatarBitmap.isRecycled()) {
+            if (avatarBitmap != null && !avatarBitmap.isRecycled()) {
                 avatarBitmap.recycle();
                 avatarBitmap = null;
             }
             try {
-                if(fileOutputStream != null) {
+                if (fileOutputStream != null) {
                     fileOutputStream.flush();
                     fileOutputStream.close();
                 }
@@ -339,7 +349,7 @@ public class FaceDetectorActivity extends Activity {
 
         }
 
-        if(baos != null) {
+        if (baos != null) {
             try {
                 baos.close();
             } catch (IOException var17) {
@@ -347,7 +357,7 @@ public class FaceDetectorActivity extends Activity {
             }
         }
 
-        if(image != null && !image.isRecycled()) {
+        if (image != null && !image.isRecycled()) {
             image.recycle();
             image = null;
         }
@@ -356,17 +366,17 @@ public class FaceDetectorActivity extends Activity {
     }
 
     private Bitmap scaleImage(Bitmap bm, int newWidth, int newHeight) {
-        if(bm == null) {
+        if (bm == null) {
             return null;
         } else {
             int width = bm.getWidth();
             int height = bm.getHeight();
-            float scaleWidth = (float)newWidth / (float)width;
-            float scaleHeight = (float)newHeight / (float)height;
+            float scaleWidth = (float) newWidth / (float) width;
+            float scaleHeight = (float) newHeight / (float) height;
             Matrix matrix = new Matrix();
             matrix.postScale(scaleWidth, scaleHeight);
             Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
-            if(bm != null & !bm.isRecycled()) {
+            if (bm != null & !bm.isRecycled()) {
                 bm.recycle();
                 bm = null;
             }
@@ -377,9 +387,9 @@ public class FaceDetectorActivity extends Activity {
 
     private Bitmap rotaingImageView(int angle, Bitmap bitmap) {
         Matrix matrix = new Matrix();
-        matrix.postRotate((float)angle);
+        matrix.postRotate((float) angle);
         Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-        if(resizedBitmap != bitmap && bitmap != null && !bitmap.isRecycled()) {
+        if (resizedBitmap != bitmap && bitmap != null && !bitmap.isRecycled()) {
             bitmap.recycle();
             bitmap = null;
         }

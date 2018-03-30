@@ -19,12 +19,12 @@ import java.io.ByteArrayOutputStream;
  * @author: <a href="http://xiaoyaoyou1212.360doc.com">DAWI</a>
  * @date: 2017/8/10 10:14
  */
-public class NormalFaceDetector<T> extends BaseFaceDetector<T> {
+public class SystemFaceDetector<T> extends BaseFaceDetector<T> {
 
     private FaceDetector.Face[] mFaces;
     private byte[] mPreviewBuffer;
 
-    public NormalFaceDetector() {
+    public SystemFaceDetector() {
         super();
     }
 
@@ -93,6 +93,7 @@ public class NormalFaceDetector<T> extends BaseFaceDetector<T> {
     private void getFaceRect() {
         Rect[] faceRectList = new Rect[mDetectorData.getFacesCount()];
         Rect rect = null;
+        int index = 0;
         float distance = 0;
         for (int i = 0; i < mDetectorData.getFacesCount(); i++) {
             faceRectList[i] = new Rect();
@@ -103,6 +104,7 @@ public class NormalFaceDetector<T> extends BaseFaceDetector<T> {
                 if (eyeDistance > distance) {
                     distance = eyeDistance;
                     rect = faceRectList[i];
+                    index = i;
                 }
                 PointF midEyesPoint = new PointF();
                 face.getMidPoint(midEyesPoint);
@@ -117,10 +119,18 @@ public class NormalFaceDetector<T> extends BaseFaceDetector<T> {
                 ViseLog.i("FaceRectList[" + i + "]:" + faceRectList[i]);
             }
         }
-        mDetectorData.setLightIntensity(FaceUtil.getYUVLight(mDetectorData.getFaceData(), rect, mCameraWidth));
+        int width = (int) (mPreviewHeight * mZoomRatio / 5);
+        if (rect != null && mCameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            int left = rect.left;
+            rect.left = width - rect.right;
+            rect.right = width - left;
+            faceRectList[index].left = rect.left;
+            faceRectList[index].right = rect.right;
+        }
+        mDetectorData.setLightIntensity(FaceUtil.getYUVLight(mDetectorData.getFaceData(), rect, width));
         mDetectorData.setFaceRectList(faceRectList);
         if (mCameraWidth > 0) {
-            mDetectorData.setDistance(distance * 2 / mCameraWidth);
+            mDetectorData.setDistance(distance * 2.5f / mCameraWidth);
         }
     }
 }

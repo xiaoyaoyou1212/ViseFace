@@ -8,7 +8,7 @@ import android.hardware.Camera;
  * @author: <a href="http://xiaoyaoyou1212.360doc.com">DAWI</a>
  * @date: 2017/8/10 10:16
  */
-public class DetectorProxy<T>{
+public class DetectorProxy<T> {
     private CameraPreview mCameraPreview;
     private FaceRectView mFaceRectView;
     private IFaceDetector<T> mFaceDetector;
@@ -16,6 +16,7 @@ public class DetectorProxy<T>{
 
     /**
      * 构造函数，需传入自定义相机预览界面
+     *
      * @param mCameraPreview 相机预览界面
      */
     private DetectorProxy(CameraPreview mCameraPreview) {
@@ -24,17 +25,16 @@ public class DetectorProxy<T>{
 
     /**
      * 设置绘制人脸检测框界面
+     *
      * @param mFaceRectView
      */
     public void setFaceRectView(FaceRectView mFaceRectView) {
         this.mFaceRectView = mFaceRectView;
-        if (this.mFaceRectView != null && mCameraPreview != null) {
-            this.mFaceRectView.setWidth(mCameraPreview.getCameraWidth());
-        }
     }
 
     /**
      * 设置人脸检测类，默认实现为原生检测类，可以替换成第三方库检测类
+     *
      * @param faceDetector 人脸检测类
      * @return
      */
@@ -49,6 +49,7 @@ public class DetectorProxy<T>{
 
     /**
      * 设置相机检查监听
+     *
      * @param mCheckListener
      * @return
      */
@@ -60,6 +61,7 @@ public class DetectorProxy<T>{
 
     /**
      * 设置检测监听
+     *
      * @param mDataListener
      */
     public void setDataListener(final IDataListener<T> mDataListener) {
@@ -81,6 +83,7 @@ public class DetectorProxy<T>{
 
     /**
      * 设置相机预览为前置还是后置摄像头
+     *
      * @param mCameraId
      * @return
      */
@@ -90,14 +93,23 @@ public class DetectorProxy<T>{
             if (mCameraPreview != null) {
                 mCameraPreview.setCameraId(mCameraId);
             }
-            if (mFaceRectView != null) {
-                mFaceRectView.setCameraId(mCameraId);
-            }
+        }
+    }
+
+    /**
+     * 设置像素最低要求
+     *
+     * @param mMinCameraPixels
+     */
+    public void setMinCameraPixels(long mMinCameraPixels) {
+        if (mCameraPreview != null) {
+            mCameraPreview.setMinCameraPixels(mMinCameraPixels);
         }
     }
 
     /**
      * 设置检测最大人脸数量
+     *
      * @param mMaxFacesCount
      * @return
      */
@@ -109,6 +121,7 @@ public class DetectorProxy<T>{
 
     /**
      * 设置是否绘制人脸检测框
+     *
      * @param mDrawFaceRect
      */
     public void setDrawFaceRect(boolean mDrawFaceRect) {
@@ -117,6 +130,7 @@ public class DetectorProxy<T>{
 
     /**
      * 设置人脸检测框是否是矩形
+     *
      * @param mFaceIsRect
      */
     public void setFaceIsRect(boolean mFaceIsRect) {
@@ -127,6 +141,7 @@ public class DetectorProxy<T>{
 
     /**
      * 设置人脸检测框颜色
+     *
      * @param rectColor
      */
     public void setFaceRectColor(int rectColor) {
@@ -164,6 +179,7 @@ public class DetectorProxy<T>{
 
     /**
      * 获取相机ID
+     *
      * @return
      */
     public int getCameraId() {
@@ -183,14 +199,16 @@ public class DetectorProxy<T>{
     }
 
     public static class Builder<T> {
+        private static final int MIN_CAMERA_PIXELS = 5000000;
         private static final int MAX_DETECTOR_FACES = 5;
 
         private CameraPreview mCameraPreview;
         private FaceRectView mFaceRectView;
-        private IFaceDetector<T> mFaceDetector;
         private ICameraCheckListener mCheckListener;
         private IDataListener<T> mDataListener;
+        private IFaceDetector<T> mFaceDetector = new SystemFaceDetector<>();
         private int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+        private long mMinCameraPixels = MIN_CAMERA_PIXELS;
         private int mMaxFacesCount = MAX_DETECTOR_FACES;
         private int mFaceRectColor = Color.rgb(255, 203, 15);
         private boolean mDrawFaceRect = false;
@@ -212,6 +230,11 @@ public class DetectorProxy<T>{
 
         public Builder setCameraId(int mCameraId) {
             this.mCameraId = mCameraId;
+            return this;
+        }
+
+        public Builder setMinCameraPixels(long mMinCameraPixels) {
+            this.mMinCameraPixels = mMinCameraPixels;
             return this;
         }
 
@@ -251,13 +274,14 @@ public class DetectorProxy<T>{
             detectorProxy.setCheckListener(mCheckListener);
             detectorProxy.setDataListener(mDataListener);
             detectorProxy.setMaxFacesCount(mMaxFacesCount);
-            detectorProxy.setCameraId(mCameraId);
+            detectorProxy.setMinCameraPixels(mMinCameraPixels);
             if (mFaceRectView != null && mDrawFaceRect) {
                 detectorProxy.setFaceRectView(mFaceRectView);
                 detectorProxy.setDrawFaceRect(mDrawFaceRect);
                 detectorProxy.setFaceRectColor(mFaceRectColor);
                 detectorProxy.setFaceIsRect(mFaceIsRect);
             }
+            detectorProxy.setCameraId(mCameraId);
             return detectorProxy;
         }
     }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.hardware.Camera;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -19,8 +18,6 @@ import com.vise.log.ViseLog;
 public class FaceRectView extends SurfaceView implements SurfaceHolder.Callback {
 
     private SurfaceHolder mHolder;
-    private int mCameraId;
-    private int mWidth;
     private int mRectColor;
     private boolean mFaceIsRect;
 
@@ -59,19 +56,8 @@ public class FaceRectView extends SurfaceView implements SurfaceHolder.Callback 
 
     }
 
-    public FaceRectView setCameraId(int mCameraId) {
-        this.mCameraId = mCameraId;
-        invalidate();
-        return this;
-    }
-
     public FaceRectView setFaceIsRect(boolean mFaceIsRect) {
         this.mFaceIsRect = mFaceIsRect;
-        return this;
-    }
-
-    public FaceRectView setWidth(int mWidth) {
-        this.mWidth = mWidth;
         return this;
     }
 
@@ -82,6 +68,7 @@ public class FaceRectView extends SurfaceView implements SurfaceHolder.Callback 
 
     /**
      * 绘制人脸识别框
+     *
      * @param mDetectorData
      */
     public <T> void drawFaceRect(DetectorData<T> mDetectorData) {
@@ -96,10 +83,9 @@ public class FaceRectView extends SurfaceView implements SurfaceHolder.Callback 
         }
 
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-        boolean frontCamera = Camera.CameraInfo.CAMERA_FACING_FRONT == mCameraId;
         if (mDetectorData.getFaceRectList() != null && mDetectorData.getFaceRectList().length > 0) {
             for (Rect rect : mDetectorData.getFaceRectList()) {
-                FaceUtil.drawFaceRect(canvas, rect, mRectColor, mWidth, frontCamera, mFaceIsRect);
+                FaceUtil.drawFaceRect(canvas, rect, mRectColor, mFaceIsRect);
             }
         } else {
             ViseLog.d("faces:0");
